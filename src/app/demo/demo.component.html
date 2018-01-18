@@ -1,0 +1,384 @@
+<div style="padding: 4px;height: 330px;border:solid;border-color: #800080;">
+	<form >
+	<fieldset class="scheduler-border" style="width:50%; float:left;" >
+		<legend class="scheduler-border border-dark" style="color: #800080">Search</legend>
+	
+		<table id="searchTable">
+			<thead></thead>
+			<tbody>
+				<tr>
+					<td style="font-weight: bold">Batch ID</td>
+					<td><input type="text" placeholder="" [(ngModel)]="batchVal" name="batch"></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+				<tr>
+					<td style="font-weight: bold">Source System</td>
+					<td><angular2-multiselect [data]="dropdownList"
+							[(ngModel)]="selectedItems" [settings]="dropdownSettings"
+							(onSelect)="onItemSelect($event)"
+							(onDeSelect)="OnItemDeSelect($event)"
+							(onSelectAll)="onSelectAll($event)"
+							(onDeSelectAll)="onDeSelectAll($event)" [(ngModel)]="sourceSysVal" name="sourcesys"> </angular2-multiselect></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+				<tr>
+					<td style="font-weight: bold">From Date:</td>
+					<td><input type="date" class="form-control"
+						placeholder="From Date" [(ngModel)]="fromDateVal" name="fromdate"></td>
+					<td style="font-weight: bold">&nbsp; To:</td>
+					<td><input type="date" class="form-control"
+						placeholder="To Date" [(ngModel)]="toDateVal" name="todate"></td>
+				</tr>
+				
+				<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td><button type="button" class="btn btn-sm py-2" (click)="selectedSearchChange()" >Search</button>
+						
+						<button type="button" class="btn btn-sm py-2" (click)="reset()">Reset</button></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+			</tbody>
+		</table>
+	
+	</fieldset>
+</form>
+	<fieldset class="scheduler-border" style="width:50%; position:relative;">
+		<legend class="scheduler-border" style="color: #800080">Summary</legend>
+		<table class="table table-striped" border="1">
+			<thead>
+				<tr>
+					<th (click)="sort('id')">Batch Id <span
+						class="fa fa-fw fa-sort" *ngIf="key =='id'"
+						[ngClass]="{'fa-sort-asc':!reverse,'fa-sort-desc':reverse}"></span>
+					</th>
+
+					<th (click)="sort('matched')">Matched <span
+						class="fa fa-fw fa-sort" *ngIf="key =='matched'"
+						[ngClass]="{'fa-sort-asc':!reverse,'fa-sort-desc':reverse}"></span>
+					</th>
+
+					<th (click)="sort('unmatched')">Unmatched <span
+						class="fa fa-fw fa-sort" *ngIf="key =='unmatched'"
+						[ngClass]="{'fa-sort-asc':!reverse,'fa-sort-desc':reverse}"></span>
+					</th>
+				</tr>
+
+			</thead>
+			<tbody class="border border-dark">
+				<tr
+					*ngFor="let batch of batchs | orderBy: key : reverse | filter:filter | paginate: { itemsPerPage: 3, currentPage: pg }; let i = index">
+					<td>{{batch.id}}</td>
+					<td>{{batch.matched}}</td>
+					<td>{{batch.unmatched}}</td>
+				</tr>
+			</tbody>			
+			<pagination-controls (pageChange)="pg = $event" previousLabel="" nextLabel=""></pagination-controls>
+		</table>
+	</fieldset>
+</div>
+
+<div id="searchresult" *ngIf="selectedSearch" style="padding: 4px;height: 500px;border:solid;border-color: #800080;">
+
+<div class="row  mt-2 mr-1 ml-1">
+	<div class="col-sm-1">
+		<div class="row  mt-2 mr-1 ml-1">
+			<label style="color: #800080;font-weight: bold">All</label> <input
+				class="form-check-input" type="radio" name="search1"
+				[(ngModel)]="filter" />
+
+		</div>
+	</div>
+	<div class="col-sm-1">
+		<div class="row  mt-2 mr-1 ml-1">
+			<label style="color: #800080;font-weight: bold">Unmatched</label> <input
+				class="form-check-input" type="radio" name="search1"
+				value="difference" [(ngModel)]="filter">
+
+		</div>
+	</div>
+	<div class="col-sm-10"></div>
+</div>
+
+<div class="row pt-2 ">
+	<div class="col-sm-2 border border-dark">
+		<table class="table  ">
+			<thead>
+
+				<tr>
+
+					<th (click)="sortKey('keyid')" style="color: #800080">Key <span
+						class="fa fa-fw fa-sort" *ngIf="key1 =='keyid'"
+						[ngClass]="{'fa-sort-asc':!reverse1,'fa-sort-desc':reverse1}"></span>
+					</th>
+
+
+				</tr>
+
+			</thead>
+			<tbody>
+				<tr
+         *ngFor="let contact of contacts | orderBy: key1 : reverse1 | filter:filter | paginate: { itemsPerPage: 6, currentPage: pg }; let i = index">
+
+					<td><a href="#"> <span
+							*ngIf="contact.matched=='difference'" class="priority-red">
+								{{contact.keyid}} </span> <span *ngIf="contact.matched=='same'"
+							class="priority-black   "> {{contact.keyid}} </span>
+					</a></td>
+
+				</tr>
+			</tbody>
+			<pagination-controls (pageChange)="pg = $event" previousLabel="" nextLabel=""></pagination-controls>
+		</table>
+
+	</div>
+
+	<div class="col-sm-10 border border-dark">
+
+
+
+		<table class="table table-bordered table-fixed">
+			<thead>
+				<tr>
+					<th scope="col" style="color: #800080">Field Name</th>
+					<th scope="col" style="color: #800080">Generated data</th>
+					<th scope="col" style="color: #800080">Target data</th>
+
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td colspan="3" class="color_grey">
+                      <a
+                       type="button" (click)="isCollapsed = !isCollapsed" 
+
+                        [attr.aria-expanded]="!isCollapsed"
+                        aria-controls="personDetails"role="button">
+
+                        <span class="fa" [ngClass]="{'fa-plus-circle text-dark':isCollapsed,'fa-minus-circle text-dark':!isCollapsed}"></span>
+                     </a>Person Details
+
+
+               </td>
+
+
+				</tr>
+
+			</tbody>
+			
+			<tbody id="personDetails" [ngClass]="{'myCollapse':isCollapsed,'myCollapse.in':!isCollapsed}">
+
+
+<tr>
+
+<th
+scope="row"
+>First Name
+
+
+</th>
+
+<td>xxx</td>
+
+<td>xxx</td>
+
+</tr>
+
+<tr>
+
+<th
+scope="row">Last Name</th>
+
+<td>yyy</td>
+
+<td>yyy</td>
+
+</tr>
+
+<tr>
+
+<th
+scope="row">Middle Name</th>
+
+<td>zzz</td>
+
+<td>zzz</td>
+
+</tr>
+
+
+
+</tbody>
+
+      
+			<tbody>
+				<tr>
+
+					<td
+					colspan="3"
+					class="color_grey">
+					
+					<a
+					type="button" (click)="isCollapsedAdd
+					 = !isCollapsedAdd" 
+					
+					[attr.aria-expanded]="!isCollapsedAdd"
+					aria-controls="addressDetails"role="button">
+					
+					<span
+					class="fa" [ngClass]="{'fa-plus-circle
+					 text-dark':isCollapsedAdd,'fa-minus-circle text-dark':!isCollapsedAdd}"></span>
+					
+					</a>
+					
+					Address Details
+					
+					</td>
+					
+					
+					
+					</tr>
+					
+			</tbody>
+			<tbody
+id="addressDetails" [ngClass]="{'myCollapse':isCollapsedAdd,'myCollapse.in':!isCollapsedAdd}">
+
+<tr>
+
+<th
+scope="row">Line</th>
+
+<td>111 Remo Street</td>
+
+<td>111 Remo Street</td>
+
+</tr>
+
+<tr>
+
+<th
+scope="row">City</th>
+
+<td>NewYork</td>
+
+<td>California</td>
+
+</tr>
+
+<tr>
+
+<th
+scope="row">State</th>
+
+<td>USA</td>
+
+<td>USA</td>
+
+</tr>
+
+
+
+</tbody>
+
+      
+      <tbody>
+		<tr>
+
+			<td
+			colspan="3"
+			class="color_grey">
+			
+			<a
+			type="button" (click)="isCollapsedTele
+			 = !isCollapsedTele" 
+			
+			[attr.aria-expanded]="!isCollapsedTele"
+			aria-controls="addressDetails"role="button">
+			
+			<span
+			class="fa" [ngClass]="{'fa-plus-circle
+			 text-dark':isCollapsedTele,'fa-minus-circle text-dark':!isCollapsedTele}"></span>
+			
+			</a>
+			
+			Tele Communication
+			
+			</td>
+			
+			
+			
+			</tr>
+			
+			</tbody>
+			<tbody class="collapse" id="Eleccomm">
+				<tr>
+
+					<td
+					colspan="3"
+					class="color_grey">
+					
+					<a
+					type="button" (click)="isCollapsedElect
+					 = !isCollapsedElect" 
+					
+					[attr.aria-expanded]="!isCollapsedElect"
+					aria-controls="addressDetails"role="button">
+					
+					<span
+					class="fa" [ngClass]="{'fa-plus-circle
+					 text-dark':isCollapsedElect,'fa-minus-circle text-dark':!isCollapsedElect}"></span>
+					
+					</a>
+					
+					Electronic Communication
+					
+					</td>
+					
+					
+					
+					</tr>
+					
+					
+      </tbody>
+      <tbody>
+		<tr>
+
+			<td
+			colspan="3"
+			class="color_grey">
+			
+			<a
+			type="button" (click)="isCollapsedSocio
+			 = !isCollapsedSocio" 
+			
+			[attr.aria-expanded]="!isCollapsedSocio"
+			aria-controls="addressDetails"role="button">
+			
+			<span
+			class="fa" [ngClass]="{'fa-plus-circle
+			 text-dark':isCollapsedSocio,'fa-minus-circle text-dark':!isCollapsedSocio}"></span>
+			
+			</a>
+			
+			Social Media
+			
+			</td>
+			
+			
+			
+			</tr>
+			
+			</tbody>
+			
+
+		</table>
+
+	</div>
+
+</div>
+</div>
